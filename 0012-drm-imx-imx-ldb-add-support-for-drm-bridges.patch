@@ -7,6 +7,8 @@ Allow for connecting a DRM bridge to the LDB device, to enable
 conversion of the LVDS signal to something such as eDP.
 
 Signed-off-by: Sean Cross <xobs@kosagi.com>
+
+(sakaki: hunks modified for 4.7.2)
 ---
  drivers/gpu/drm/imx/imx-ldb.c | 43 ++++++++++++++++++++++++++++++++++++-------
  1 file changed, 36 insertions(+), 7 deletions(-)
@@ -21,8 +23,8 @@ index abacc8f..0595e23 100644
  	struct drm_panel *panel;
 +	struct drm_bridge *bridge;
  	struct device_node *child;
+ 	struct i2c_adapter *ddc;
  	int chno;
- 	void *edid;
 @@ -398,6 +399,23 @@ static int imx_ldb_get_clk(struct imx_ldb *ldb, int chno)
  	return PTR_ERR_OR_ZERO(ldb->clk_pll[chno]);
  }
@@ -49,7 +51,7 @@ index abacc8f..0595e23 100644
  {
 @@ -424,6 +442,14 @@ static int imx_ldb_register(struct drm_device *drm,
  	drm_encoder_init(drm, &imx_ldb_ch->encoder, &imx_ldb_encoder_funcs,
- 			 DRM_MODE_ENCODER_LVDS);
+ 			 DRM_MODE_ENCODER_LVDS, NULL);
  
 +        /* Pre-empt LDB connector creation if there's a bridge */
 +	if (imx_ldb_ch->bridge) {
@@ -62,39 +64,44 @@ index abacc8f..0595e23 100644
  	drm_connector_helper_add(&imx_ldb_ch->connector,
  			&imx_ldb_connector_helper_funcs);
  	drm_connector_init(drm, &imx_ldb_ch->connector,
-@@ -590,14 +616,17 @@ static int imx_ldb_bind(struct device *dev, struct device *master, void *data)
- 			endpoint = of_get_child_by_name(port, "endpoint");
- 			if (endpoint) {
- 				remote = of_graph_get_remote_port_parent(endpoint);
--				if (remote)
--					channel->panel = of_drm_find_panel(remote);
--				else
-+				if (!remote)
- 					return -EPROBE_DEFER;
--				if (!channel->panel) {
--					dev_err(dev, "panel not found: %s\n",
+@@ -589,13 +615,16 @@ static int imx_ldb_bind(struct device *dev, struct device *master, void *data)
+ 			remote = of_graph_get_remote_port_parent(ep);
+ 			of_node_put(ep);
+-			if (remote)
+-				channel->panel = of_drm_find_panel(remote);
+-			else
++			if (!remote)
+ 				return -EPROBE_DEFER;
+ 			of_node_put(remote);
+-			if (!channel->panel) {
+-				dev_err(dev, "panel not found: %s\n",
 +
-+				channel->panel = of_drm_find_panel(remote);
-+				channel->bridge = of_drm_find_bridge(remote);
++			channel->panel = of_drm_find_panel(remote);
++			channel->bridge = of_drm_find_bridge(remote);
 +
-+				if (!channel->panel && !channel->bridge) {
-+					dev_err(dev,
-+						"panel or bridge not found: %s\n",
- 						remote->full_name);
--					return -EPROBE_DEFER;
-+						return -EPROBE_DEFER;
- 				}
++			if (!channel->panel && !channel->bridge) {
++				dev_err(dev,
++					"panel or bridge not found: %s\n",
+ 					remote->full_name);
+-				return -EPROBE_DEFER;
++					return -EPROBE_DEFER;
  			}
  		}
-@@ -606,7 +635,7 @@ static int imx_ldb_bind(struct device *dev, struct device *master, void *data)
- 		if (edidp) {
- 			channel->edid = kmemdup(edidp, channel->edid_len,
- 						GFP_KERNEL);
--		} else if (!channel->panel) {
-+		} else if ((!channel->panel) && (!channel->bridge)) {
- 			ret = of_get_drm_display_mode(child, &channel->mode, 0);
- 			if (!ret)
- 				channel->mode_valid = 1;
+@@ -622,11 +635,11 @@ static int imx_ldb_bind(struct device *dev, struct device *master, void *data)
+ 			if (edidp) {
+ 				channel->edid = kmemdup(edidp,
+ 							channel->edid_len,
+							GFP_KERNEL);
+-			} else if (!channel->panel) {
++			} else if ((!channel->panel) && (!channel->bridge)) {
+ 				/* fallback to display-timings node */
+ 				ret = of_get_drm_display_mode(child,
+ 							      &channel->mode,
+ 							      OF_USE_NATIVE_MODE);
+ 				if (!ret)
+ 					channel->mode_valid = 1;
+ 			}
+ 		}
 -- 
 2.7.3
 
