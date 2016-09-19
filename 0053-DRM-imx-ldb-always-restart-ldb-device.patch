@@ -10,6 +10,8 @@ The hope is that this will cause the two channels to have synced
 clocks, even if they were set up askew in the bootloader.
 
 Signed-off-by: Sean Cross <xobs@kosagi.com>
+
+(sakaki: modify context for hunk 2, for 4.7.2)
 ---
  drivers/gpu/drm/imx/imx-ldb.c | 9 +++++++++
  1 file changed, 9 insertions(+)
@@ -32,7 +34,7 @@ index 42875e6..a1c18fd 100644
 @@ -218,6 +222,7 @@ static void imx_ldb_encoder_commit(struct drm_encoder *encoder)
  	struct imx_ldb *ldb = imx_ldb_ch->ldb;
  	int dual = ldb->ldb_ctrl & LDB_SPLIT_MODE_EN;
- 	int mux = imx_drm_encoder_get_mux_id(imx_ldb_ch->child, encoder);
+ 	int mux = drm_of_encoder_active_port_id(imx_ldb_ch->child, encoder);
 +	int reg;
  
  	drm_panel_prepare(imx_ldb_ch->panel);
