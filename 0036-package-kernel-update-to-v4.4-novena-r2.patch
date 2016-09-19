@@ -4,6 +4,8 @@ Date: Wed, 13 Jan 2016 17:29:41 +0800
 Subject: [PATCH 36/65] package-kernel: update to v4.4-novena-r2
 
 Signed-off-by: Sean Cross <xobs@kosagi.com>
+
+(sakaki: just map to 4.7.2)
 ---
  package-kernel.sh | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -17,7 +19,7 @@ index 5d1c2ab..f8213d2 100755
  # A script to build the kernel .deb files, as used by Kosagi.
  threads=$(($(grep '^processor' /proc/cpuinfo  | cut -d: -f2 | tail -n1)+1))
 -version=4.4-novena-r1
-+version=4.4-novena-r2
++version=4.7.2-novena
  
  echo "Building v${version} with ${threads} threads"
  git tag -d "v${version}" 2> /dev/null
