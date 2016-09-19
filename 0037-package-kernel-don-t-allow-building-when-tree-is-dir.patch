@@ -10,6 +10,8 @@ the string -dirty appended.
 If the repo has local changes, refuse to build.
 
 Signed-off-by: Sean Cross <xobs@kosagi.com>
+
+(sakaki: context modified for 4.7.2)
 ---
  package-kernel.sh | 6 ++++++
  1 file changed, 6 insertions(+)
@@ -20,7 +22,7 @@ index f8213d2..41b3fde 100755
 +++ b/package-kernel.sh
 @@ -3,6 +3,12 @@
  threads=$(($(grep '^processor' /proc/cpuinfo  | cut -d: -f2 | tail -n1)+1))
- version=4.4-novena-r2
+ version=4.7.2-novena
  
 +if git diff-index --name-only HEAD | grep -qv "^scripts/package"; then
 +	echo "Repo has local changes.  Stash or commit them."
