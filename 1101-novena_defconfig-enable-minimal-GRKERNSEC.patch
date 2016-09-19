@@ -1,0 +1,18 @@
+(sakaki: minimal config to support old ARM userland in a hardened kernel; if)
+(we don't do this, Mozilla software like firefox will segfault)
+(see e.g. https://forums.grsecurity.net/viewtopic.php?f=3&t=4479)
+(this patch is not needed in an unhardened kernel)
+---
+diff a/arch/arm/configs/novena_defconfig b/arch/arm/configs/novena_defconfig
+--- a/arch/arm/configs/novena_defconfig
++++ b/arch/arm/configs/novena_defconfig
+@@ -5367,3 +5367,6 @@
+ # CONFIG_SG_SPLIT is not set
+ CONFIG_ARCH_HAS_SG_CHAIN=y
+ # CONFIG_VIRTUALIZATION is not set
++CONFIG_GRKERNSEC=y
++CONFIG_GRKERNSEC_CONFIG_CUSTOM=y
++CONFIG_GRKERNSEC_OLD_ARM_USERLAND=y
+-- 
+2.7.3
+
