@@ -1,0 +1,53 @@
+From 50da2f88cf2f6e9748422cead46c538d9950588c Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Tue, 22 Apr 2014 13:30:08 +0800
+Subject: [PATCH 21/65] deb-pkg: Add support for KBUILD_DTB
+
+Enable packaging of dtb files alongsde kernel.
+
+If KBUILD_DTB is specified, then copy that dtb file to the resulting
+kernel package.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ scripts/package/builddeb | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 6c3b038..d98113d 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -113,12 +113,15 @@ fi
+ case $ARCH in
+ um)
+ 	installed_image_path="usr/bin/linux-$version"
++	installed_dtb_path="usr/bin/linux-$version.dtb"
+ 	;;
+ parisc|mips|powerpc)
+ 	installed_image_path="boot/vmlinux-$version"
++	installed_dtb_path="boot/vmlinuz-$version.dtb"
+ 	;;
+ *)
+ 	installed_image_path="boot/vmlinuz-$version"
++	installed_dtb_path="boot/vmlinuz-$version.dtb"
+ esac
+ 
+ BUILD_DEBUG="$(grep -s '^CONFIG_DEBUG_INFO=y' $KCONFIG_CONFIG || true)"
+@@ -155,6 +158,14 @@ if grep -q "^CONFIG_OF=y" $KCONFIG_CONFIG ; then
+ 	fi
+ fi
+ 
++if [ ! -z $KBUILD_DTB ]; then
++	if [ -e $KBUILD_DTB ]; then
++		cp $KBUILD_DTB "$tmpdir/$installed_dtb_path"
++	else
++		cp arch/$ARCH/boot/dts/$KBUILD_DTB "$tmpdir/$installed_dtb_path"
++	fi
++fi
++
+ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
+ 	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_install
+ 	rm -f "$tmpdir/lib/modules/$version/build"
+-- 
+2.7.3
+

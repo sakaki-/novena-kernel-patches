@@ -1,0 +1,53 @@
+From c8ebe38b5e8ff114ad1a5f7e1388f6649166de5f Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Thu, 11 Feb 2016 16:01:12 +0800
+Subject: [PATCH 53/65] DRM: imx: ldb: always restart ldb device
+
+Always write "0" to the ldb control registers before writing
+the actual, wanted values.
+
+The hope is that this will cause the two channels to have synced
+clocks, even if they were set up askew in the bootloader.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ drivers/gpu/drm/imx/imx-ldb.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/gpu/drm/imx/imx-ldb.c b/drivers/gpu/drm/imx/imx-ldb.c
+index 42875e6..a1c18fd 100644
+--- a/drivers/gpu/drm/imx/imx-ldb.c
++++ b/drivers/gpu/drm/imx/imx-ldb.c
+@@ -152,6 +152,10 @@ static void imx_ldb_set_clock(struct imx_ldb *ldb, int mux, int chno,
+ 		unsigned long serial_clk, unsigned long di_clk)
+ {
+ 	int ret;
++	int ctrl;
++
++	regmap_read(ldb->regmap, IOMUXC_GPR2, &ctrl);
++	dev_dbg(ldb->dev, "%d:%s: LDB_CTRL: 0x%08x\n", chno, __func__, ctrl);
+ 
+ 	dev_dbg(ldb->dev, "%d:%s: now: %ld want: %ld\n", chno, __func__,
+ 			clk_get_rate(ldb->clk_pll[chno]), serial_clk);
+@@ -218,6 +222,7 @@ static void imx_ldb_encoder_commit(struct drm_encoder *encoder)
+ 	struct imx_ldb *ldb = imx_ldb_ch->ldb;
+ 	int dual = ldb->ldb_ctrl & LDB_SPLIT_MODE_EN;
+ 	int mux = imx_drm_encoder_get_mux_id(imx_ldb_ch->child, encoder);
++	int reg;
+ 
+ 	drm_panel_prepare(imx_ldb_ch->panel);
+ 
+@@ -253,6 +258,10 @@ static void imx_ldb_encoder_commit(struct drm_encoder *encoder)
+ 				   mux << lvds_mux->shift);
+ 	}
+ 
++	regmap_read(ldb->regmap, IOMUXC_GPR2, &reg);
++	dev_dbg(ldb->dev, "%s: LDB_CTRL: 0x%08x\n", __func__, reg);
++	regmap_write(ldb->regmap, IOMUXC_GPR2, 0);
++	udelay(100);
+ 	regmap_write(ldb->regmap, IOMUXC_GPR2, ldb->ldb_ctrl);
+ 
+ 	drm_panel_enable(imx_ldb_ch->panel);
+-- 
+2.7.3
+

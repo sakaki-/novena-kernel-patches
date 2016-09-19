@@ -1,0 +1,33 @@
+From bf0b042057c0548d28fb4e201ef2aa61f9cda0f5 Mon Sep 17 00:00:00 2001
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Date: Mon, 4 Jan 2016 14:34:32 +0000
+Subject: [PATCH 32/65] drm/etnaviv: unlock on error in etnaviv_gem_get_iova()
+
+We have to drop a lock before returning -ENOMEM here.
+
+Fixes: a8c21a5451d8 ('drm/etnaviv: add initial etnaviv DRM driver')
+Signed-off-by: Dan Carpenter <dan.carpenter@xxxxxxxxxx>
+---
+ drivers/gpu/drm/etnaviv/etnaviv_gem.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/etnaviv/etnaviv_gem.c b/drivers/gpu/drm/etnaviv/etnaviv_gem.c
+index 8d6f859..9f77c3b 100644
+--- a/drivers/gpu/drm/etnaviv/etnaviv_gem.c
++++ b/drivers/gpu/drm/etnaviv/etnaviv_gem.c
+@@ -305,8 +305,10 @@ int etnaviv_gem_get_iova(struct etnaviv_gpu *gpu,
+ 	mapping = etnaviv_gem_get_vram_mapping(etnaviv_obj, NULL);
+ 	if (!mapping) {
+ 		mapping = kzalloc(sizeof(*mapping), GFP_KERNEL);
+-		if (!mapping)
+-			return -ENOMEM;
++		if (!mapping) {
++			ret = -ENOMEM;
++			goto out;
++		}
+ 
+ 		INIT_LIST_HEAD(&mapping->scan_node);
+ 		mapping->object = etnaviv_obj;
+-- 
+2.7.3
+

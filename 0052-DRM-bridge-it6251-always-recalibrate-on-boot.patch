@@ -1,0 +1,33 @@
+From 09cd224bc585d0276c00e77107f10b304326ade5 Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Thu, 11 Feb 2016 16:00:34 +0800
+Subject: [PATCH 52/65] DRM: bridge: it6251: always recalibrate on boot
+
+Ignore the "is_stable()" check on boot, because sometimes it's
+invalid.  Recalibrate always.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ drivers/gpu/drm/bridge/it6251.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/drivers/gpu/drm/bridge/it6251.c b/drivers/gpu/drm/bridge/it6251.c
+index ef0cbd3..0272492 100644
+--- a/drivers/gpu/drm/bridge/it6251.c
++++ b/drivers/gpu/drm/bridge/it6251.c
+@@ -279,12 +279,6 @@ static int it6251_init(struct it6251_bridge *it6251)
+ 	int reg;
+ 	int stable_delays;
+ 
+-	/* The bootloader can leave the chip already initialized */
+-	if (it6251_is_stable(it6251)) {
+-		dev_info(it6251->dev, "eDP system is already stable\n");
+-		return 0;
+-	}
+-
+ 	/* Reset DisplayPort half (setting bit 2 causes it to not respond
+ 	 * over i2c, which is considered "normal".  This write will report
+ 	 * failure, but will actually succeed. */
+-- 
+2.7.3
+

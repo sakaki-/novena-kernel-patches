@@ -1,0 +1,39 @@
+From 0b8adb00f4d831a72d8d43691c961743979b3256 Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Tue, 22 Apr 2014 13:30:08 +0800
+Subject: [PATCH 35/65] deb-pkg: Add support for KBUILD_DTB
+
+Enable packaging of dtb files alongsde kernel.
+
+If KBUILD_DTB is specified, then copy that dtb file to the resulting
+kernel package.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+
+Conflicts:
+	scripts/package/builddeb
+---
+ scripts/package/builddeb | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index b9c98f5..4ea9cb1 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -174,13 +174,6 @@ else
+ 	cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
+ fi
+ 
+-if grep -q "^CONFIG_OF=y" $KCONFIG_CONFIG ; then
+-	# Only some architectures with OF support have this target
+-	if grep -q dtbs_install "${srctree}/arch/$SRCARCH/Makefile"; then
+-		$MAKE KBUILD_SRC= INSTALL_DTBS_PATH="$tmpdir/usr/lib/$packagename" dtbs_install
+-	fi
+-fi
+-
+ if [ ! -z $KBUILD_DTB ]; then
+ 	if [ -e $KBUILD_DTB ]; then
+ 		cp $KBUILD_DTB "$tmpdir/$installed_dtb_path"
+-- 
+2.7.3
+

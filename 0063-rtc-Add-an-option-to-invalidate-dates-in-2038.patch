@@ -1,0 +1,64 @@
+From e42a8f1c70fc2153268653d3f20d3827dacf59b6 Mon Sep 17 00:00:00 2001
+From: Alexandre Belloni <alexandre.belloni@free-electrons.com>
+Date: Sat, 20 Feb 2016 04:54:58 +0100
+Subject: [PATCH 63/65] rtc: Add an option to invalidate dates in 2038
+
+hctosys is setting the system time from the kernel. This means that 32bit
+system can get their time set to a date after the 31bit time_t overflow.
+
+This is currently an issue as userspace is not yet ready to handle those
+dates and may break. For example systemd's usage of timerfd shows that the
+timerfd will always fire immediately because it can't be set at a date
+after the current date.
+
+The new RTC_INVALID_2038 option will make sure that date after 03:09:07 on
+Jan 19 2038 are invalid. This is 5 minutes before the 31bit overflow. This
+leaves enough time for userspace to react and is short enough to make the
+issue visible.
+
+Signed-off-by: Alexandre Belloni <alexandre.belloni@free-electrons.com>
+---
+ drivers/rtc/Kconfig   | 10 ++++++++++
+ drivers/rtc/rtc-lib.c |  5 ++++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
+index 2a52424..306ffe1 100644
+--- a/drivers/rtc/Kconfig
++++ b/drivers/rtc/Kconfig
+@@ -73,6 +73,16 @@ config RTC_DEBUG
+ 	  Say yes here to enable debugging support in the RTC framework
+ 	  and individual RTC drivers.
+ 
++config RTC_INVALID_2038
++	bool "Invalidate dates after 2038"
++	depends on !64BIT
++	default y
++	help
++	  Saying yes here will make any date after 03:09:07 on Jan 19 2038
++	  invalid (this is 5 minutes before the 31 bits overflow of a time_t).
++	  This is useful if your userspace is not yet ready to handle 64 bits
++	  times.
++
+ comment "RTC interfaces"
+ 
+ config RTC_INTF_SYSFS
+diff --git a/drivers/rtc/rtc-lib.c b/drivers/rtc/rtc-lib.c
+index e6bfb9c..1ba1482 100644
+--- a/drivers/rtc/rtc-lib.c
++++ b/drivers/rtc/rtc-lib.c
+@@ -107,7 +107,10 @@ int rtc_valid_tm(struct rtc_time *tm)
+ 		|| ((unsigned)tm->tm_min) >= 60
+ 		|| ((unsigned)tm->tm_sec) >= 60)
+ 		return -EINVAL;
+-
++#ifdef CONFIG_RTC_INVALID_2038
++	if (rtc_tm_to_time64(tm) > 0x7FFFFED4) /* 5 minutes before overflow */
++		return -EINVAL;
++#endif
+ 	return 0;
+ }
+ EXPORT_SYMBOL(rtc_valid_tm);
+-- 
+2.7.3
+

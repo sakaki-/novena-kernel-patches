@@ -1,0 +1,29 @@
+From 49d5f1070f3880b03db1a55347d28b77b221771e Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Thu, 19 May 2016 12:52:09 +0800
+Subject: [PATCH 65/65] package-kernel: update to v4.4-novena-r9
+
+This applies some RTC fixes, which hopefully will improve systemd's
+boot reliability.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ package-kernel.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/package-kernel.sh b/package-kernel.sh
+index 0cba01c..e4ddf3a 100755
+--- a/package-kernel.sh
++++ b/package-kernel.sh
+@@ -1,7 +1,7 @@
+ #!/bin/sh -e
+ # A script to build the kernel .deb files, as used by Kosagi.
+ threads=$(($(grep '^processor' /proc/cpuinfo  | cut -d: -f2 | tail -n1)+1))
+-version=4.4-novena-r8
++version=4.4-novena-r9
+ 
+ if git diff-index --name-only HEAD | grep -qv "^scripts/package"; then
+ 	echo "Repo has local changes.  Stash or commit them."
+-- 
+2.7.3
+

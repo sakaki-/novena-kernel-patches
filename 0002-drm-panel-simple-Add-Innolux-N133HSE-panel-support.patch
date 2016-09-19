@@ -1,0 +1,62 @@
+From 516fae5e20874582ef064416e7618422058eac35 Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Mon, 22 Dec 2014 13:59:58 +0800
+Subject: [PATCH 02/65] drm/panel: simple: Add Innolux N133HSE panel support
+
+The Innolux N133HSE panel is a 13.3" 1920x1080 panel that contains an
+integrated backlight, and connects via eDP.
+
+It is used in the Kosagi Novena.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ drivers/gpu/drm/panel/panel-simple.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
+index f97b73e..d0fd427 100644
+--- a/drivers/gpu/drm/panel/panel-simple.c
++++ b/drivers/gpu/drm/panel/panel-simple.c
+@@ -856,6 +856,29 @@ static const struct panel_desc innolux_n116bge = {
+ 	},
+ };
+ 
++static const struct drm_display_mode innolux_n133hse_ea1_mode = {
++	.clock = 138500,
++	.hdisplay = 1920,
++	.hsync_start = 1920 + 46,
++	.hsync_end = 1920 + 46 + 30,
++	.htotal = 1920 + 160,
++	.vdisplay = 1080,
++	.vsync_start = 1080 + 2,
++	.vsync_end = 1080 + 2 + 4,
++	.vtotal = 1080 + 32,
++	.vrefresh = 60,
++};
++
++static const struct panel_desc innolux_n133hse_ea1 = {
++	.modes = &innolux_n133hse_ea1_mode,
++	.num_modes = 1,
++	.bpc = 8,
++	.size = {
++		.width = 293,
++		.height = 165,
++	},
++};
++
+ static const struct drm_display_mode innolux_n156bge_l21_mode = {
+ 	.clock = 69300,
+ 	.hdisplay = 1366,
+@@ -1161,6 +1184,9 @@ static const struct of_device_id platform_of_match[] = {
+ 		.compatible = "innolux,n116bge",
+ 		.data = &innolux_n116bge,
+ 	}, {
++		.compatible = "innolux,n133hse-ea1",
++		.data = &innolux_n133hse_ea1,
++	}, {
+ 		.compatible = "innolux,n156bge-l21",
+ 		.data = &innolux_n156bge_l21,
+ 	}, {
+-- 
+2.7.3
+

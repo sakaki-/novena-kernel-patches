@@ -1,0 +1,49 @@
+From 0a7f7291dfc8cb69a761d38683ecd1343803c33a Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Thu, 23 Jul 2015 18:12:39 +0800
+Subject: [PATCH 03/65] novena: drm: imx: HACK: Manually specify CRTCs
+
+The CRTC assignment code doesn't realize that ldb needs two CRTCs that
+must be a part of the same IPU when using both channels.
+
+This patch hacks it so that the "IPU" only uses IPU1, and the DW-HDMI code
+only uses IPU2.  It is Novena-specific and should not be used anywhere else.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ drivers/gpu/drm/imx/dw_hdmi-imx.c  | 4 ++++
+ drivers/gpu/drm/imx/imx-drm-core.c | 3 +++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/drivers/gpu/drm/imx/dw_hdmi-imx.c b/drivers/gpu/drm/imx/dw_hdmi-imx.c
+index 98605ea..d8c9abd 100644
+--- a/drivers/gpu/drm/imx/dw_hdmi-imx.c
++++ b/drivers/gpu/drm/imx/dw_hdmi-imx.c
+@@ -236,6 +236,10 @@ static int dw_hdmi_imx_bind(struct device *dev, struct device *master,
+ 	platform_set_drvdata(pdev, hdmi);
+ 
+ 	encoder->possible_crtcs = drm_of_find_possible_crtcs(drm, dev->of_node);
++
++	/* Hack: Only use IPU2 */
++	encoder->possible_crtcs &= 0x0c;
++
+ 	/*
+ 	 * If we failed to find the CRTC(s) which this encoder is
+ 	 * supposed to be connected to, it's because the CRTC has
+diff --git a/drivers/gpu/drm/imx/imx-drm-core.c b/drivers/gpu/drm/imx/imx-drm-core.c
+index 7b990b4..17d7b02 100644
+--- a/drivers/gpu/drm/imx/imx-drm-core.c
++++ b/drivers/gpu/drm/imx/imx-drm-core.c
+@@ -423,6 +423,9 @@ int imx_drm_encoder_parse_of(struct drm_device *drm,
+ 
+ 	encoder->possible_crtcs = crtc_mask;
+ 
++	/* Hack: Only allow these devices to use IPU1 */
++	encoder->possible_crtcs &= 0x03;
++
+ 	/* FIXME: this is the mask of outputs which can clone this output. */
+ 	encoder->possible_clones = ~0;
+ 
+-- 
+2.7.3
+

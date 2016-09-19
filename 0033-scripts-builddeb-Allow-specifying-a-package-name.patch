@@ -1,0 +1,36 @@
+From e2ce51df6622fc8b416fe01e0b7d2654d286078d Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Tue, 14 Oct 2014 10:16:36 +0800
+Subject: [PATCH 33/65] scripts: builddeb: Allow specifying a package name
+
+We want to be able to upgrade kernel packages.  In order to do this, we
+need to have a consistent naming scheme, not one with the version number
+embedded into the name.  Take a new parameter, KDEB_PKGNAME, and if specified
+set the package name to that, rather than to the version number.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ scripts/package/builddeb | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 137d8cb..fd312d9 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -107,6 +107,13 @@ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+ fi
+ 
++if [ ! -z "${KDEB_PKGNAME}" ]
++then
++	packagename=linux-image-${KDEB_PKGNAME}
++	fwpackagename=linux-firmware-image-${KDEB_PKGNAME}
++	kernel_headers_packagename=linux-headers-${KDEB_PKGNAME}
++fi
++
+ # Not all arches have the same installed path in debian
+ # XXX: have each arch Makefile export a variable of the canonical image install
+ # path instead
+-- 
+2.7.3
+

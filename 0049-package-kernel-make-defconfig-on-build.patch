@@ -1,0 +1,44 @@
+From a5fcfa9f2dfef653dc5a3d1d8608e86fbf2429cc Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Wed, 10 Feb 2016 18:12:40 +0800
+Subject: [PATCH 49/65] package-kernel: make defconfig on build
+
+This will ensure developers have the correct config file.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ package-kernel.sh | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/package-kernel.sh b/package-kernel.sh
+index ed9c655..a88369c 100755
+--- a/package-kernel.sh
++++ b/package-kernel.sh
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/sh -e
+ # A script to build the kernel .deb files, as used by Kosagi.
+ threads=$(($(grep '^processor' /proc/cpuinfo  | cut -d: -f2 | tail -n1)+1))
+ version=4.4-novena-r4
+@@ -12,6 +12,9 @@ fi
+ echo "Building v${version} with ${threads} threads"
+ git tag -d "v${version}" 2> /dev/null
+ git tag "v${version}"
++
++make novena_defconfig
++
+ make -j${threads} \
+ 	KBUILD_DEBARCH=armhf \
+ 	KBUILD_IMAGE=zImage \
+@@ -22,7 +25,7 @@ make -j${threads} \
+ 	KDEB_SOURCENAME="linux-image-novena" \
+ 	EMAIL="xobs@kosagi.com" \
+ 	NAME="Sean Cross" \
+-	dtbs || exit 1
++	dtbs
+ 
+ # Delete the debian "files" listing, as it tends to be out of date
+ rm -f debian/files
+-- 
+2.7.3
+

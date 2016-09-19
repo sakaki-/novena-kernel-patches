@@ -1,0 +1,36 @@
+From b4a00c68df55de37285b12417cda2c9d1d08fd8a Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Wed, 13 Jan 2016 17:31:20 +0800
+Subject: [PATCH 37/65] package-kernel: don't allow building when tree is dirty
+
+When there are local changes, the package won't accurately reflect what's
+in the repo.  This is a bad thing.  It also leads to version numbers with
+the string -dirty appended.
+
+If the repo has local changes, refuse to build.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ package-kernel.sh | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/package-kernel.sh b/package-kernel.sh
+index f8213d2..41b3fde 100755
+--- a/package-kernel.sh
++++ b/package-kernel.sh
+@@ -3,6 +3,12 @@
+ threads=$(($(grep '^processor' /proc/cpuinfo  | cut -d: -f2 | tail -n1)+1))
+ version=4.4-novena-r2
+ 
++if git diff-index --name-only HEAD | grep -qv "^scripts/package"; then
++	echo "Repo has local changes.  Stash or commit them."
++	exit 1
++fi
++
++
+ echo "Building v${version} with ${threads} threads"
+ git tag -d "v${version}" 2> /dev/null
+ git tag "v${version}"
+-- 
+2.7.3
+

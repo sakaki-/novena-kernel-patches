@@ -1,0 +1,71 @@
+From 032013d2f56d1523f85c671d3938bacd8b2f21ed Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Fri, 15 Jan 2016 13:59:11 +0800
+Subject: [PATCH 41/65] gpu: imx: attempt to fix ldb stability
+
+Add a delay, taken from the FSL code, to try and increase LDB
+stability.  Otherwise, the LDB has about a 3% chance of being
+unstable when loading.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ drivers/gpu/ipu-v3/ipu-di.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/drivers/gpu/ipu-v3/ipu-di.c b/drivers/gpu/ipu-v3/ipu-di.c
+index 359268e..7f66401 100644
+--- a/drivers/gpu/ipu-v3/ipu-di.c
++++ b/drivers/gpu/ipu-v3/ipu-di.c
+@@ -12,6 +12,7 @@
+  * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+  * for more details.
+  */
++#include <linux/delay.h>
+ #include <linux/export.h>
+ #include <linux/module.h>
+ #include <linux/types.h>
+@@ -436,6 +437,20 @@ static void ipu_di_config_clock(struct ipu_di *di,
+ 
+ 			clk_set_rate(clk, sig->mode.pixelclock);
+ 
++			/*
++			 * The clocks need time to stabilize before the clkgen
++			 * is enabled.  Without this, the clocks may not be
++			 * properly synchronized, and HSYNC and VSYNC may come
++			 * at unusual intervals.  This will manifest itself in
++			 * an unstable display, where the only solution is to
++			 * re-initialize the whole panel, e.g. by running:
++			 *    xrandr --output LVDS1 --off
++			 *    xrandr --output LVDS1 --auto
++			 * The Freescale drivers include this delay, which
++			 * solves the problem.
++			 */
++			msleep(15);
++
+ 			in_rate = clk_get_rate(clk);
+ 			div = DIV_ROUND_CLOSEST(in_rate, sig->mode.pixelclock);
+ 			div = clamp(div, 1U, 255U);
+@@ -476,6 +491,20 @@ static void ipu_di_config_clock(struct ipu_di *di,
+ 
+ 			clk_set_rate(clk, sig->mode.pixelclock);
+ 
++			/*
++			 * The clocks need time to stabilize before the clkgen
++			 * is enabled.  Without this, the clocks may not be
++			 * properly synchronized, and HSYNC and VSYNC may come
++			 * at unusual intervals.  This will manifest itself in
++			 * an unstable display, where the only solution is to
++			 * re-initialize the whole panel, e.g. by running:
++			 *    xrandr --output LVDS1 --off
++			 *    xrandr --output LVDS1 --auto
++			 * The Freescale drivers include this delay, which
++			 * solves the problem.
++			 */
++			msleep(15);
++
+ 			in_rate = clk_get_rate(clk);
+ 			div = DIV_ROUND_CLOSEST(in_rate, sig->mode.pixelclock);
+ 			div = clamp(div, 1U, 255U);
+-- 
+2.7.3
+

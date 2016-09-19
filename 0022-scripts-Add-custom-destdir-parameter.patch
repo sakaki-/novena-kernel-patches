@@ -1,0 +1,57 @@
+From 098ae523304bfa1769a3d05bb99fb1b8b988c81d Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Fri, 10 Oct 2014 16:32:11 +0800
+Subject: [PATCH 22/65] scripts: Add custom destdir parameter
+
+We don't want packages installed to /boot since it's FAT-formatted.
+Instead, our diversion script as part of U-Boot will take care of that.
+As a workaround, add the KBUILD_DESTDIR variable so that users can specify
+the path to place the finished kernel.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ scripts/package/builddeb | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index d98113d..137d8cb 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -120,8 +120,9 @@ parisc|mips|powerpc)
+ 	installed_dtb_path="boot/vmlinuz-$version.dtb"
+ 	;;
+ *)
+-	installed_image_path="boot/vmlinuz-$version"
+-	installed_dtb_path="boot/vmlinuz-$version.dtb"
++	# XXX: This is a glorious hack which should be fixed
++	installed_image_path="usr/share/linux-novena/vmlinuz-$version"
++	installed_dtb_path="usr/share/linux-novena/vmlinuz-$version.dtb"
+ esac
+ 
+ BUILD_DEBUG="$(grep -s '^CONFIG_DEBUG_INFO=y' $KCONFIG_CONFIG || true)"
+@@ -133,6 +134,12 @@ mkdir -p "$tmpdir/lib" "$tmpdir/boot"
+ mkdir -p "$fwdir/lib/firmware/$version/"
+ mkdir -p "$kernel_headers_dir/lib/modules/$version/"
+ 
++if [ ! -z $KBUILD_DESTDIR ]; then
++	installed_image_path="${KBUILD_DESTDIR}/vmlinuz-$version"
++	installed_dtb_path="${KBUILD_DESTDIR}/vmlinuz-$version.dtb"
++	mkdir -p "${tmpdir}/${KBUILD_DESTDIR}"
++fi
++
+ # Build and install the kernel
+ if [ "$ARCH" = "um" ] ; then
+ 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin" "$tmpdir/usr/share/doc/$packagename"
+@@ -140,6 +147,9 @@ if [ "$ARCH" = "um" ] ; then
+ 	cp System.map "$tmpdir/usr/lib/uml/modules/$version/System.map"
+ 	cp $KCONFIG_CONFIG "$tmpdir/usr/share/doc/$packagename/config"
+ 	gzip "$tmpdir/usr/share/doc/$packagename/config"
++elif [ ! -z $KBUILD_DESTDIR ]; then
++	cp System.map "$tmpdir/${KBUILD_DESTDIR}/System.map-$version"
++	cp $KCONFIG_CONFIG "$tmpdir/${KBUILD_DESTDIR}/config-$version"
+ else
+ 	cp System.map "$tmpdir/boot/System.map-$version"
+ 	cp $KCONFIG_CONFIG "$tmpdir/boot/config-$version"
+-- 
+2.7.3
+

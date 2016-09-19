@@ -1,0 +1,29 @@
+From 9205204b014fd0643da1d4e85c2c4a2b20dce7f6 Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Thu, 11 Feb 2016 16:04:39 +0800
+Subject: [PATCH 54/65] package-kernel: don't die when branch doesn't exist
+
+The program removes the current branch as its first step.  If the
+branch doesn't exist, that's fine, continue anyway.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ package-kernel.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/package-kernel.sh b/package-kernel.sh
+index 0aac389..722ef22 100755
+--- a/package-kernel.sh
++++ b/package-kernel.sh
+@@ -10,7 +10,7 @@ fi
+ 
+ 
+ echo "Building v${version} with ${threads} threads"
+-git tag -d "v${version}" 2> /dev/null
++git tag -d "v${version}" 2> /dev/null || true
+ git tag "v${version}"
+ 
+ make novena_defconfig
+-- 
+2.7.3
+

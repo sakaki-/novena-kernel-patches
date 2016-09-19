@@ -1,0 +1,28 @@
+From 8d3f098ed6cf1986cc9c44bdc7647fcc5be2b5d7 Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Wed, 12 Aug 2015 17:50:14 +0800
+Subject: [PATCH 08/65] arm: dts: imx6qdl: Add cell count to thermal node
+
+The thermal node needs to indicate how many cells it has, otherwise
+it cannot be used by the device tree thermal zone code.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ arch/arm/boot/dts/imx6qdl.dtsi | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/boot/dts/imx6qdl.dtsi b/arch/arm/boot/dts/imx6qdl.dtsi
+index 2b6cc8b..ea7cc9c 100644
+--- a/arch/arm/boot/dts/imx6qdl.dtsi
++++ b/arch/arm/boot/dts/imx6qdl.dtsi
+@@ -700,6 +700,7 @@
+ 				fsl,tempmon = <&anatop>;
+ 				fsl,tempmon-data = <&ocotp>;
+ 				clocks = <&clks IMX6QDL_CLK_PLL3_USB_OTG>;
++				#thermal-sensor-cells = <1>;
+ 			};
+ 
+ 			usbphy1: usbphy@020c9000 {
+-- 
+2.7.3
+

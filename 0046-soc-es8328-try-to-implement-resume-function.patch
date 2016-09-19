@@ -1,0 +1,44 @@
+From 6a7670a3ac7b9bb0659e7655e8e332c4a4d364da Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Wed, 10 Feb 2016 17:46:23 +0800
+Subject: [PATCH 46/65] soc: es8328: try to implement resume function
+
+This tries to work around the slow-audio-resume problem.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ sound/soc/codecs/es8328.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/sound/soc/codecs/es8328.c b/sound/soc/codecs/es8328.c
+index 1825dc4..6559327 100644
+--- a/sound/soc/codecs/es8328.c
++++ b/sound/soc/codecs/es8328.c
+@@ -620,6 +620,16 @@ static struct snd_soc_dai_driver es8328_dai = {
+ 	.ops = &es8328_dai_ops,
+ };
+ 
++static int es8328_resume(struct snd_soc_codec *codec)
++{
++	struct es8328_priv *es8328 = snd_soc_codec_get_drvdata(codec);
++
++	snd_soc_cache_sync(codec);
++	es8328_set_rates(codec, es8328);
++
++	return 0;
++}
++
+ static int es8328_codec_probe(struct snd_soc_codec *codec)
+ {
+ 	struct es8328_priv *es8328;
+@@ -682,6 +692,7 @@ EXPORT_SYMBOL_GPL(es8328_regmap_config);
+ 
+ static struct snd_soc_codec_driver es8328_codec_driver = {
+ 	.probe		  = es8328_codec_probe,
++	.resume		  = es8328_resume,
+ 	.remove		  = es8328_remove,
+ 	.set_bias_level	  = es8328_set_bias_level,
+ 	.suspend_bias_off = true,
+-- 
+2.7.3
+

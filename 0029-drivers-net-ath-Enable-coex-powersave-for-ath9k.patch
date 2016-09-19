@@ -1,0 +1,36 @@
+From 506c5e5e50475bb899e4333522f8127c6a2932d6 Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Tue, 17 Feb 2015 11:03:28 +0800
+Subject: [PATCH 29/65] drivers: net: ath: Enable coex/powersave for ath9k
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ drivers/net/wireless/ath/ath9k/init.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/wireless/ath/ath9k/init.c b/drivers/net/wireless/ath/ath9k/init.c
+index 2e2b92b..eec8f76 100644
+--- a/drivers/net/wireless/ath/ath9k/init.c
++++ b/drivers/net/wireless/ath/ath9k/init.c
+@@ -49,15 +49,15 @@ int ath9k_led_blink;
+ module_param_named(blink, ath9k_led_blink, int, 0444);
+ MODULE_PARM_DESC(blink, "Enable LED blink on activity");
+ 
+-static int ath9k_btcoex_enable;
++static int ath9k_btcoex_enable = 1;
+ module_param_named(btcoex_enable, ath9k_btcoex_enable, int, 0444);
+ MODULE_PARM_DESC(btcoex_enable, "Enable wifi-BT coexistence");
+ 
+-static int ath9k_bt_ant_diversity;
++static int ath9k_bt_ant_diversity = 1;
+ module_param_named(bt_ant_diversity, ath9k_bt_ant_diversity, int, 0444);
+ MODULE_PARM_DESC(bt_ant_diversity, "Enable WLAN/BT RX antenna diversity");
+ 
+-static int ath9k_ps_enable;
++static int ath9k_ps_enable = 1;
+ module_param_named(ps_enable, ath9k_ps_enable, int, 0444);
+ MODULE_PARM_DESC(ps_enable, "Enable WLAN PowerSave");
+ 
+-- 
+2.7.3
+

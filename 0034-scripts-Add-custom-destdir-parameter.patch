@@ -1,0 +1,35 @@
+From ac520c47e49e45a6f9799d6c707dc4f1c127e61b Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Fri, 10 Oct 2014 16:32:11 +0800
+Subject: [PATCH 34/65] scripts: Add custom destdir parameter
+
+We don't want packages installed to /boot since it's FAT-formatted.
+Instead, our diversion script as part of U-Boot will take care of that.
+As a workaround, add the KBUILD_DESTDIR variable so that users can specify
+the path to place the finished kernel.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ scripts/package/builddeb | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index fd312d9..b9c98f5 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -147,6 +147,12 @@ if [ ! -z $KBUILD_DESTDIR ]; then
+ 	mkdir -p "${tmpdir}/${KBUILD_DESTDIR}"
+ fi
+ 
++if [ ! -z $KBUILD_DESTDIR ]; then
++	installed_image_path="${KBUILD_DESTDIR}/vmlinuz-$version"
++	installed_dtb_path="${KBUILD_DESTDIR}/vmlinuz-$version.dtb"
++	mkdir -p "${tmpdir}/${KBUILD_DESTDIR}"
++fi
++
+ # Build and install the kernel
+ if [ "$ARCH" = "um" ] ; then
+ 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin" "$tmpdir/usr/share/doc/$packagename"
+-- 
+2.7.3
+

@@ -1,0 +1,51 @@
+From c75e6f3d9f3a7c3d15e854fa3d37f8ad7660d11a Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Fri, 19 Feb 2016 12:11:03 +0800
+Subject: [PATCH 57/65] senoko: repeatedly try to powerdown
+
+If the bus is busy, the powerdown message will fail.  Bus contention can
+cause the STM32 I2C block to lock up.
+
+To work around this, we have a timer on the Senoko that resets I2C if it's
+busy for more than a certain amount of time.
+
+If we fail to power off. sleep an ever-increasing amount of time in order
+to give the Senoko board a chance to revive itself in this case.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ drivers/mfd/senoko.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/mfd/senoko.c b/drivers/mfd/senoko.c
+index 7460473..3c13836 100644
+--- a/drivers/mfd/senoko.c
++++ b/drivers/mfd/senoko.c
+@@ -249,6 +249,8 @@ static void senoko_supply_power_off(void)
+ {
+ 	struct senoko *senoko = g_senoko;
+ 	int err;
++	uint32_t sleep_counter = 0;
++	uint32_t sleep_counter_increment = 10000;
+ 
+ 	dev_info(senoko->dev, "shutting down\n");
+ 	regcache_cache_bypass(senoko->regmap, true);
+@@ -256,7 +258,15 @@ static void senoko_supply_power_off(void)
+ 	while (1) {
+ 		err = senoko_write(senoko, REG_POWER,
+ 				   REG_POWER_STATE_OFF | REG_POWER_KEY_WRITE);
++
+ 		/* Board should be off now */
++
++		/* But in any case, sometimes i2c is blocked, so sleep for
++		 * an ever-increasing amount of time, trying to re-send
++		 * the power-off message.
++		 */
++		sleep_counter += sleep_counter_increment;
++		udelay(sleep_counter);
+ 	}
+ }
+ 
+-- 
+2.7.3
+

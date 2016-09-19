@@ -1,0 +1,46 @@
+From 468b85c56f0942b518a8b03ac0b6293fe6df8408 Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Thu, 9 Apr 2015 13:39:42 +0800
+Subject: [PATCH 24/65] ASoC: imx-es8328: add power management support
+
+This fixes power management support for the es8328 on i.MX6.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ sound/soc/fsl/imx-es8328.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/sound/soc/fsl/imx-es8328.c b/sound/soc/fsl/imx-es8328.c
+index 20e7400..d67ef1a 100644
+--- a/sound/soc/fsl/imx-es8328.c
++++ b/sound/soc/fsl/imx-es8328.c
+@@ -191,7 +191,6 @@ static int imx_es8328_probe(struct platform_device *pdev)
+ 		goto fail;
+ 	}
+ 
+-	platform_set_drvdata(pdev, data);
+ fail:
+ 	of_node_put(ssi_np);
+ 	of_node_put(codec_np);
+@@ -201,7 +200,9 @@ fail:
+ 
+ static int imx_es8328_remove(struct platform_device *pdev)
+ {
+-	struct imx_es8328_data *data = platform_get_drvdata(pdev);
++	struct snd_soc_card *card = platform_get_drvdata(pdev);
++	struct imx_es8328_data *data = container_of(card,
++					struct imx_es8328_data, card);
+ 
+ 	snd_soc_jack_free_gpios(&headset_jack, ARRAY_SIZE(headset_jack_gpios),
+ 				headset_jack_gpios);
+@@ -220,6 +221,7 @@ MODULE_DEVICE_TABLE(of, imx_es8328_dt_ids);
+ static struct platform_driver imx_es8328_driver = {
+ 	.driver = {
+ 		.name = "imx-es8328",
++		.pm = &snd_soc_pm_ops,
+ 		.of_match_table = imx_es8328_dt_ids,
+ 	},
+ 	.probe = imx_es8328_probe,
+-- 
+2.7.3
+

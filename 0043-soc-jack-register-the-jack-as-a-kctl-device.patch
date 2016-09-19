@@ -1,0 +1,29 @@
+From e151ac314c31d76f5d4eef847e9573b7491d6505 Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Fri, 15 Jan 2016 14:00:48 +0800
+Subject: [PATCH 43/65] soc: jack: register the jack as a kctl device
+
+We want pulseaudio to recognize the audio jack as a kctl device, so
+have soc devices register their jack as a kctl device.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ sound/soc/soc-jack.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sound/soc/soc-jack.c b/sound/soc/soc-jack.c
+index fbaa1bb..1410250 100644
+--- a/sound/soc/soc-jack.c
++++ b/sound/soc/soc-jack.c
+@@ -48,7 +48,7 @@ int snd_soc_card_jack_new(struct snd_soc_card *card, const char *id, int type,
+ 	INIT_LIST_HEAD(&jack->jack_zones);
+ 	BLOCKING_INIT_NOTIFIER_HEAD(&jack->notifier);
+ 
+-	ret = snd_jack_new(card->snd_card, id, type, &jack->jack, false, false);
++	ret = snd_jack_new(card->snd_card, id, type, &jack->jack, true, false);
+ 	if (ret)
+ 		return ret;
+ 
+-- 
+2.7.3
+

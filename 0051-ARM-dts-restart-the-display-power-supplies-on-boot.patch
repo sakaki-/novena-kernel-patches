@@ -1,0 +1,36 @@
+From 5f3c4528c7714e23b174c232af70fcaafecf2ba1 Mon Sep 17 00:00:00 2001
+From: Sean Cross <xobs@kosagi.com>
+Date: Thu, 11 Feb 2016 15:59:28 +0800
+Subject: [PATCH 51/65] ARM: dts: restart the display power supplies on boot
+
+Remove the "regulator-boot-on" flag for both the display and backlight
+power supplies.  This forces them to do a complete reset on boot.
+
+Signed-off-by: Sean Cross <xobs@kosagi.com>
+---
+ arch/arm/boot/dts/imx6q-novena.dts | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6q-novena.dts b/arch/arm/boot/dts/imx6q-novena.dts
+index 1009c81..ba77aed 100644
+--- a/arch/arm/boot/dts/imx6q-novena.dts
++++ b/arch/arm/boot/dts/imx6q-novena.dts
+@@ -91,7 +91,6 @@
+ 		parent-supply = <&reg_display>;
+ 		gpio = <&gpio4 15 GPIO_ACTIVE_HIGH>;
+ 		enable-active-high;
+-		regulator-boot-on;
+ 	};
+ 
+ 	reg_display: display-regulator {
+@@ -102,7 +101,6 @@
+ 		startup-delay-us = <2000000>;
+ 		gpio = <&gpio5 28 GPIO_ACTIVE_HIGH>;
+ 		enable-active-high;
+-		regulator-boot-on;
+ 	};
+ 
+ 	reg_sata: sata-regulator {
+-- 
+2.7.3
+
