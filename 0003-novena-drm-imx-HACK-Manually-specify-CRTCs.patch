@@ -10,6 +10,8 @@ This patch hacks it so that the "IPU" only uses IPU1, and the DW-HDMI code
 only uses IPU2.  It is Novena-specific and should not be used anywhere else.
 
 Signed-off-by: Sean Cross <xobs@kosagi.com>
+
+(sakaki: context modified for 4.7.2)
 ---
  drivers/gpu/drm/imx/dw_hdmi-imx.c  | 4 ++++
  drivers/gpu/drm/imx/imx-drm-core.c | 3 +++
@@ -20,7 +22,7 @@ index 98605ea..d8c9abd 100644
 --- a/drivers/gpu/drm/imx/dw_hdmi-imx.c
 +++ b/drivers/gpu/drm/imx/dw_hdmi-imx.c
 @@ -236,6 +236,10 @@ static int dw_hdmi_imx_bind(struct device *dev, struct device *master,
- 	platform_set_drvdata(pdev, hdmi);
+ 		return -ENXIO;
  
  	encoder->possible_crtcs = drm_of_find_possible_crtcs(drm, dev->of_node);
 +
