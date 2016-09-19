@@ -6,6 +6,8 @@ Subject: [PATCH 19/65] ARM: novena_defconfig: add default config for novena
 This adds a device-specific defconfig for the Novena platform.
 
 Signed-off-by: Sean Cross <xobs@kosagi.com>
+
+(sakaki: patchlevel 1 -> 0, as required by Gentoo's unipatch)
 ---
  arch/arm/configs/novena_defconfig | 5368 +++++++++++++++++++++++++++++++++++++
  1 file changed, 5368 insertions(+)
@@ -15,7 +17,7 @@ diff --git a/arch/arm/configs/novena_defconfig b/arch/arm/configs/novena_defconf
 new file mode 100644
 index 0000000..542f40e
 --- /dev/null
-+++ b/arch/arm/configs/novena_defconfig
++++ arch/arm/configs/novena_defconfig
 @@ -0,0 +1,5368 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
