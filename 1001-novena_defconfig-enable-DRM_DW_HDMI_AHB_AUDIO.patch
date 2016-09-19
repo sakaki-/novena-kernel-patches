@@ -1,0 +1,17 @@
+(sakaki: required for HDMI audio output)
+---
+diff a/arch/arm/configs/novena_defconfig b/arch/arm/configs/novena_defconfig
+--- a/arch/arm/configs/novena_defconfig
++++ b/arch/arm/configs/novena_defconfig
+@@ -3204,7 +3204,7 @@
+ # Display Interface Bridges
+ #
+ CONFIG_DRM_DW_HDMI=y
+-# CONFIG_DRM_DW_HDMI_AHB_AUDIO is not set
++CONFIG_DRM_DW_HDMI_AHB_AUDIO=y
+ CONFIG_DRM_IT6251=y
+ # CONFIG_DRM_NXP_PTN3460 is not set
+ # CONFIG_DRM_PARADE_PS8622 is not set
+-- 
+2.7.3
+
