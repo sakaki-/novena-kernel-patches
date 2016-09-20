@@ -44,7 +44,7 @@ Please choose the appropriate set of installation instructions from the below.
 
 ### Option 1: Non-Gentoo Users
 
-Fetch the patches and 4.7.2 kernel source, then patch your kernel and build as usual. The only slight trickiness comes from the fact that some of the patches are at patchlevel 0, and some at patchlevel 1 (due to quirks in Gentoo's `unipatch`, as described above).
+Fetch the patches and 4.7.2 kernel source, then patch your kernel and build as usual. The only slight trickiness comes from the fact that some of the patches are at patchlevel 0, and some at patchlevel 1 (due to quirks in Gentoo's `unipatch`, as described above), but I have supplied a small script to handle that.
 
 Here's a simple example workflow (you can of course download the kernel via `git` and other tools, but we'll just use a tarball here):
 
@@ -54,16 +54,7 @@ Here's a simple example workflow (you can of course download the kernel via `git
 ( you can also download and check the signature file; search online for details )
 ~ $ tar -xJf linux-4.7.2.tar.xz
 ~ $ cd linux-4.7.2
-linux-4.7.2 $ for P in "${HOME}/novena-kernel-patches/"*.patch; do
-  if   patch -p0 -fN --dry-run < "${P}"; then
-    patch -p0 < "${P}"
-  elif patch -p1 -fN --dry-run < "${P}"; then
-    patch -p1 < "${P}"
-  else
-    echo "Patch ${P} failed to apply, stopping" 1>&2
-    exit 1
-  fi
-done
+linux-4.7.2 $ ../novena-kernel-patches/apply-patches.sh
 ( assuming that went OK, then proceed )
 linux-4.7.2 $ make novena_defconfig
 linux-4.7.2 $ make -j4 zImage modules dtbs
