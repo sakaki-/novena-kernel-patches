@@ -5,7 +5,7 @@ Patchset for the Linux kernel (v4.7.2) on the Novena SBC, adapted from xobs' [no
 
 
 <img src="https://raw.githubusercontent.com/sakaki-/resources/master/kousagi/novena/Kousagi_Novena.jpg" alt="Kousagi Novena" width="250px" align="right"/>
-This project contains a set of patches for the Linux kernel, enabling it to be used with the Novena single-board computer. The patches were derived from xobs' [novena-linux](https://github.com/xobs/novena-linux) project, which (at the time of writing, commit [49d5f10](https://github.com/xobs/novena-linux/commit/49d5f1070f3880b03db1a55347d28b77b221771e)) contains a patchset rebased, most recently, against Linux 4.4 (commit [400e186](https://github.com/xobs/novena-linux/commit/400e1869c6aa2af116e2ce73627e551a1ecf0e1d)).
+This project contains a set of patches for the 4.7.2 Linux kernel, enabling it to be used with the Novena single-board computer. The patches were derived from xobs' [novena-linux](https://github.com/xobs/novena-linux) project, which (at the time of writing, commit [49d5f10](https://github.com/xobs/novena-linux/commit/49d5f1070f3880b03db1a55347d28b77b221771e)) contains a patchset rebased against Linux 4.4 (commit [400e186](https://github.com/xobs/novena-linux/commit/400e1869c6aa2af116e2ce73627e551a1ecf0e1d)).
 
 The `git` commit list of Novena-specific edits in xobs' `novena-linux` since the 4.4 rebase may be seen [here](https://github.com/xobs/novena-linux/compare/400e186...49d5f10). I began by exporting the (non-merge) commits as a set of patch files, thus:
 
@@ -85,6 +85,7 @@ Assuming you have my overlay installed (if not, instructions for installing it m
 ~ # eselect kernel set <n>
 ( substitute the linux-4.7.2-novena kernel's index from the list for <n>; e.g., "eselect kernel set 1" )
 ~ # cd /usr/src/linux
+~ # make novena_defconfig
 linux # make -j4 zImage modules dtbs
 ( this will take some time! if you have distcc installed, use pump make, and a higher -j value )
 linux # make modules_install
