@@ -72,11 +72,11 @@ Then simply reboot to start using your new kernel!
 
 ### Option 2: Gentoo Users
 
-This patchset is most easily installed via one of the Gentoo ebuilds that use it, for which please see my [gentoo-novena-overlay](https://github.com/sakaki-/gentoo-novena-overlay) project (_forthcoming_).
+This patchset is most easily installed via one of the Gentoo ebuilds that use it, for which please see my [novena-overlay](https://github.com/sakaki-/novena-overlay) project.
 
-I have provided two ebuilds. The first, [`sys-kernel/novena-sources`](https://github.com/sakaki-/gentoo-novena-overlay/tree/master/sys-kernel/novena-sources) mirrors [`sys-kernel/gentoo-sources`](https://packages.gentoo.org/packages/sys-kernel/gentoo-sources); the second, [`sys-kernel/novena_hardened-sources`](https://github.com/sakaki-/gentoo-novena-overlay/tree/master/sys-kernel/novena_hardened-sources) mirrors [`sys-kernel/hardened-sources`](https://packages.gentoo.org/packages/sys-kernel/hardened-sources) (and supports the `deblob` USE flag, allowing you to build a libre kernel; under which everything - with the exception of bluetooth - still works, amazingly ^-^).
+I have provided two ebuilds. The first, [`sys-kernel/novena-sources`](https://github.com/sakaki-/novena-overlay/tree/master/sys-kernel/novena-sources) mirrors [`sys-kernel/gentoo-sources`](https://packages.gentoo.org/packages/sys-kernel/gentoo-sources); the second, [`sys-kernel/novena_hardened-sources`](https://github.com/sakaki-/novena-overlay/tree/master/sys-kernel/novena_hardened-sources) mirrors [`sys-kernel/hardened-sources`](https://packages.gentoo.org/packages/sys-kernel/hardened-sources) (and supports the `deblob` USE flag, allowing you to build a libre kernel; under which everything - with the exception of bluetooth - still works, amazingly ^-^).
 
-Assuming you have my overlay installed (if not, instructions for installing it may be found [here](https://github.com/sakaki-/gentoo-novena-overlay)), you can simply do:
+Assuming you have my overlay installed (if not, instructions for installing it may be found [here](https://github.com/sakaki-/novena-overlay)), you can simply do:
 
 ```console
 ~ # emerge -v ~sys-kernel/novena-sources-4.7.2
