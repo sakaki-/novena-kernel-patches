@@ -85,7 +85,7 @@ Assuming you have my overlay installed (if not, instructions for installing it m
 ~ # eselect kernel set <n>
 ( substitute the linux-4.7.2-novena kernel's index from the list for <n>; e.g., "eselect kernel set 1" )
 ~ # cd /usr/src/linux
-~ # make novena_defconfig
+linux # make novena_defconfig
 linux # make -j4 zImage modules dtbs
 ( this will take some time! if you have distcc installed, use pump make, and a higher -j value )
 linux # make modules_install
