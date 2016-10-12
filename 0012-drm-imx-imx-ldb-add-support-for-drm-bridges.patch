@@ -9,15 +9,12 @@ conversion of the LVDS signal to something such as eDP.
 Signed-off-by: Sean Cross <xobs@kosagi.com>
 
 (sakaki: hunks modified for 4.7.2)
+(sakaki: remove failing of_graph_get_endpoint_by_regs call)
 ---
- drivers/gpu/drm/imx/imx-ldb.c | 43 ++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 36 insertions(+), 7 deletions(-)
-
 diff --git a/drivers/gpu/drm/imx/imx-ldb.c b/drivers/gpu/drm/imx/imx-ldb.c
-index abacc8f..0595e23 100644
 --- a/drivers/gpu/drm/imx/imx-ldb.c
 +++ b/drivers/gpu/drm/imx/imx-ldb.c
-@@ -57,6 +57,7 @@ struct imx_ldb_channel {
+@@ -59,6 +59,7 @@ struct imx_ldb_channel {
  	struct drm_connector connector;
  	struct drm_encoder encoder;
  	struct drm_panel *panel;
@@ -25,7 +22,7 @@ index abacc8f..0595e23 100644
  	struct device_node *child;
  	struct i2c_adapter *ddc;
  	int chno;
-@@ -398,6 +399,23 @@ static int imx_ldb_get_clk(struct imx_ldb *ldb, int chno)
+@@ -396,6 +397,23 @@ static int imx_ldb_get_clk(struct imx_ldb *ldb, int chno)
  	return PTR_ERR_OR_ZERO(ldb->clk_pll[chno]);
  }
  
@@ -49,7 +46,7 @@ index abacc8f..0595e23 100644
  static int imx_ldb_register(struct drm_device *drm,
  	struct imx_ldb_channel *imx_ldb_ch)
  {
-@@ -424,6 +442,14 @@ static int imx_ldb_register(struct drm_device *drm,
+@@ -422,6 +440,14 @@ static int imx_ldb_register(struct drm_device *drm,
  	drm_encoder_init(drm, &imx_ldb_ch->encoder, &imx_ldb_encoder_funcs,
  			 DRM_MODE_ENCODER_LVDS, NULL);
  
@@ -64,44 +61,65 @@ index abacc8f..0595e23 100644
  	drm_connector_helper_add(&imx_ldb_ch->connector,
  			&imx_ldb_connector_helper_funcs);
  	drm_connector_init(drm, &imx_ldb_ch->connector,
-@@ -589,13 +615,16 @@ static int imx_ldb_bind(struct device *dev, struct device *master, void *data)
- 			remote = of_graph_get_remote_port_parent(ep);
- 			of_node_put(ep);
+@@ -558,6 +584,7 @@ static int imx_ldb_bind(struct device *dev, struct device *master, void *data)
+ 
+ 	for_each_child_of_node(np, child) {
+ 		struct imx_ldb_channel *channel;
++		struct device_node *port;
+ 		struct device_node *ddc_node;
+ 		struct device_node *ep;
+ 
+@@ -582,23 +609,27 @@ static int imx_ldb_bind(struct device *dev, struct device *master, void *data)
+ 		 * The output port is port@4 with an external 4-port mux or
+ 		 * port@2 with the internal 2-port mux.
+ 		 */
+-		ep = of_graph_get_endpoint_by_regs(child,
+-						   imx_ldb->lvds_mux ? 4 : 2,
+-						   -1);
+-		if (ep) {
++		port = of_graph_get_port_by_id(child, imx_ldb->lvds_mux ? 4 : 2);
++		if (port) {
+ 			struct device_node *remote;
+ 
+-			remote = of_graph_get_remote_port_parent(ep);
+-			of_node_put(ep);
 -			if (remote)
--				channel->panel = of_drm_find_panel(remote);
++			ep = of_get_child_by_name(port, "endpoint");
++			if (ep) {
++				remote = of_graph_get_remote_port_parent(ep);
++				of_node_put(ep);
++				if (!remote)
++					return -EPROBE_DEFER;
++				of_node_put(remote);
++
+ 				channel->panel = of_drm_find_panel(remote);
 -			else
-+			if (!remote)
- 				return -EPROBE_DEFER;
- 			of_node_put(remote);
+-				return -EPROBE_DEFER;
+-			of_node_put(remote);
 -			if (!channel->panel) {
 -				dev_err(dev, "panel not found: %s\n",
-+
-+			channel->panel = of_drm_find_panel(remote);
-+			channel->bridge = of_drm_find_bridge(remote);
-+
-+			if (!channel->panel && !channel->bridge) {
-+				dev_err(dev,
-+					"panel or bridge not found: %s\n",
- 					remote->full_name);
+-					remote->full_name);
 -				return -EPROBE_DEFER;
-+					return -EPROBE_DEFER;
++				channel->bridge = of_drm_find_bridge(remote);
++
++				if (!channel->panel && !channel->bridge) {
++					dev_err(dev,
++						"panel or bridge not found: %s\n",
++						remote->full_name);
++						return -EPROBE_DEFER;
++				}
  			}
  		}
-@@ -622,11 +635,11 @@ static int imx_ldb_bind(struct device *dev, struct device *master, void *data)
- 			if (edidp) {
+ 
+@@ -622,7 +653,7 @@ static int imx_ldb_bind(struct device *dev, struct device *master, void *data)
  				channel->edid = kmemdup(edidp,
  							channel->edid_len,
-							GFP_KERNEL);
+ 							GFP_KERNEL);
 -			} else if (!channel->panel) {
 +			} else if ((!channel->panel) && (!channel->bridge)) {
  				/* fallback to display-timings node */
  				ret = of_get_drm_display_mode(child,
  							      &channel->mode,
- 							      OF_USE_NATIVE_MODE);
- 				if (!ret)
- 					channel->mode_valid = 1;
- 			}
- 		}
 -- 
 2.7.3
 
