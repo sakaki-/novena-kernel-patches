@@ -52,7 +52,7 @@ Here's a simple example workflow (you can of course download the kernel via `git
 ~ $ git clone https://github.com/sakaki-/novena-kernel-patches
 ~ $ wget -c https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.7.2.tar.xz
 ( you can also download and check the signature file; search online for details )
-~ $ tar -xJf linux-4.7.2.tar.xz
+~ $ tar -xjf linux-4.7.2.tar.xz
 ~ $ cd linux-4.7.2
 linux-4.7.2 $ ../novena-kernel-patches/apply-patches.sh
 ( assuming that went OK, then proceed )
