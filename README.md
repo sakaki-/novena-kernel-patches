@@ -34,8 +34,8 @@ A full list of my patch modifications may be viewed [here](https://github.com/sa
 > Please note that this patchset is provided without warranty. Use at your own risk.
 
 > Incidentally, I have chosen to use a patchlist format (rather than another rebase) because:  
-  * the set of Novena-specific edits to the kernel codebase seems quite stable now; and   
-  * I wanted a format that could easily be used by Gentoo `kernel-2` ebuilds, and also by non-Gentoo users.
+    * the set of Novena-specific edits to the kernel codebase seems quite stable now; and   
+    * I wanted a format that could easily be used by Gentoo `kernel-2` ebuilds, and also by non-Gentoo users.
 
 ## Installation
 
