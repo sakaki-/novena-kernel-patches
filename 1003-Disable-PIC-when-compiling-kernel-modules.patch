@@ -1,0 +1,28 @@
+From 043cad7f5892173ec1a6ec267eff1db8216d7a81 Mon Sep 17 00:00:00 2001
+From: Wade Cline <wadecline@hotmail.com>
+Date: Mon, 29 Apr 2019 21:34:31 -0700
+Subject: [PATCH] Disable PIC when compiling kernel modules
+
+This fixes an issue where the modules then fail to load due to
+"Unknown symbol _GLOBAL_OFFSET_TABLE_ (err 0)" errors.  If you know
+of a better fix for this then be my guest.
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 66da9a38b13b..6a63da18148c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -364,7 +364,7 @@ CHECK		= sparse
+ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
+ 		  -Wbitwise -Wno-return-void $(CF)
+ NOSTDINC_FLAGS  =
+-CFLAGS_MODULE   =
++CFLAGS_MODULE   = -fno-pic
+ AFLAGS_MODULE   =
+ LDFLAGS_MODULE  =
+ CFLAGS_KERNEL	=
+-- 
+2.21.0
+
